@@ -23,6 +23,20 @@ public class Route
 		return stops;
 	}
 	
+	@Override
+	public String toString()
+	{
+		String stopString = "";
+		
+		for(Timestamp time : stops.keySet())
+		{
+			if(stopString.isEmpty()) stopString = time + ";" + stops.get(time);
+			else stopString += "|" + time + ";" + stops.get(time);
+		}
+		
+		return capacity + "|" + stopString;
+	}
+	
 	public static Route fromString(String data)
 	{
 		int capacity = 0;
