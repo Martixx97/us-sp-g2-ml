@@ -1,5 +1,7 @@
 package intellitank.main;
 
+import java.sql.Date;
+
 public class Gasstation
 {
 	int id;
@@ -19,6 +21,14 @@ public class Gasstation
 	public String toString()
 	{
 		return id + ";" + name + ";" + brand + ";" + address.toString();
+	}
+	
+	public void fromString(String data)
+	{
+		if(!data.isEmpty())
+		{
+			// TODO
+		}
 	}
 	
 	public int getId()
