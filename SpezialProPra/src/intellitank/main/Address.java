@@ -6,6 +6,7 @@ public class Address
 	int housenumber;
 	int zip;
 	String city;
+	
 	float latitude;
 	float longitude;
 	
@@ -15,6 +16,7 @@ public class Address
 		this.housenumber = housenumber;
 		this.zip = zip;
 		this.city = city;
+		
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
@@ -23,6 +25,36 @@ public class Address
 	public String toString()
 	{
 		return street + ";" + housenumber + ";" + zip + ";" + city + ";" + latitude + ";" + longitude;
+	}
+	
+	public static Address fromString(String data)
+	{
+		String street = "";
+		int housenumber = 0;
+		int zip = 0;
+		String city = "";
+		
+		float latitude = 0f;
+		float longitude = 0f;
+		
+		if(!data.isEmpty())
+		{
+			try
+			{
+				street = data.split(";")[0];
+				housenumber = Integer.valueOf(data.split(";")[1]);
+				zip = Integer.valueOf(data.split(";")[2]);
+				city = data.split(";")[3];
+				
+				latitude = Float.valueOf(data.split(";")[4]);
+				longitude = Float.valueOf(data.split(";")[5]);
+			} catch (NumberFormatException exception)
+			{
+				exception.printStackTrace();
+			}
+		}
+		
+		return new Address(street, housenumber, zip, city, latitude, longitude);
 	}
 
 	public String getStreet()
