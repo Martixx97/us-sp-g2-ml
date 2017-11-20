@@ -1,5 +1,7 @@
 package intellitank.main;
 
+import java.util.Date;
+
 public class Timestamp
 {
 	int year;
@@ -77,9 +79,17 @@ public class Timestamp
 		return new Timestamp(year, month, day, hour, minute, second, timezone);
 	}
 	
-	public boolean compare(Timestamp time)
+	/**
+	 * -1, wenn time früher (time vor time).
+	 * 0, wenn gleich.
+	 * 1, wenn time später (time nach this).
+	 */
+	public int compare(Timestamp time)
 	{
-		return time.year == this.year && time.month == this.month && time.day == this.day && time.hour == this.hour && time.minute == this.minute && time.second == this.second && time.timezone == this.timezone;
+		Date date_time = new Date(time.year, time.month - 1, time.day, time.hour, time.minute, time.second);
+		Date date_this = new Date(this.year, this.month - 1, this.day, this.hour, this.minute, this.second);
+		
+		return date_time.compareTo(date_this);
 	}
 	
 	public int getYear()
