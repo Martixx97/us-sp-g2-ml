@@ -31,7 +31,7 @@ public class Timestamp
 		return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + timezone;
 	}
 
-	public static Timestamp read(String date)
+	public static Timestamp fromString(String date)
 	{
 		int year = 0;
 		int month = 0;
