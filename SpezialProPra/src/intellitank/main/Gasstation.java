@@ -23,12 +23,19 @@ public class Gasstation
 		return id + ";" + name + ";" + brand + ";" + address.toString();
 	}
 	
-	public void fromString(String data)
+	public static Gasstation fromString(String data)
 	{
+		int id = 0;
+		String name = "";
+		String brand = "";
+		Address address = null;
+		
 		if(!data.isEmpty())
 		{
-			// TODO
+			
 		}
+		
+		return new Gasstation(id, name, brand, address);
 	}
 	
 	public int getId()
