@@ -56,13 +56,12 @@ public class Timestamp
 				minute = Integer.valueOf(hmst.split(":")[1]);
 				
 				String st = hmst.split(":")[2];
-				System.out.println(st);
 				
-				if(st.split("+").length > 0)
+				if(!st.split("\\+")[0].equalsIgnoreCase(st))
 				{
-					second = Integer.valueOf(st.split("+")[0]);
-					timezone = "+" + st.split("+")[1];
-				} else if(st.split("-").length > 0)
+					second = Integer.valueOf(st.split("\\+")[0]);
+					timezone = "+" + st.split("\\+")[1];
+				} else if(!st.split("-")[0].equalsIgnoreCase(st))
 				{
 					second = Integer.valueOf(st.split("-")[0]);
 					timezone = "-" + st.split("-")[1];
