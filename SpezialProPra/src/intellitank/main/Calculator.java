@@ -21,7 +21,7 @@ public class Calculator
 		{
 			String price = "";
 			
-			// TODO start
+			// TODO // start //
 			
 			String prices = Reader.readURL("https://raw.githubusercontent.com/InformatiCup/InformatiCup2018/master/Eingabedaten/Benzinpreise/" + line.split(";")[2] + ".csv");
 			
@@ -57,7 +57,7 @@ public class Calculator
 				}
 			}
 			
-			// TODO end
+			// TODO // end //
 			
 			if(result.isEmpty()) result = price;
 			else result += "\\|" + price;

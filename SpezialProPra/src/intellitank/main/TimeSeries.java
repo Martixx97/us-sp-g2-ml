@@ -13,6 +13,15 @@ public class TimeSeries
 		
 	}
 	
+	public Integer forecast(Timestamp time)
+	{
+		Integer result = 0;
+		
+		// TODO //
+		
+		return result;
+	}
+	
 	public boolean addValue(Timestamp time, Integer value)
 	{
 		if(!values.containsKey(time))

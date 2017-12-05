@@ -79,6 +79,26 @@ public class Timestamp
 		return new Timestamp(year, month, day, hour, minute, second, timezone);
 	}
 	
+	public Date toDate()
+	{
+		return new Date(year, month, day, hour, minute, second);
+	}
+	
+	public static Timestamp fromDate(Date date)
+	{
+		int year = date.getYear();
+		int month = date.getMonth();
+		int day = date.getDate();
+		
+		int hour = date.getHours();
+		int minute = date.getMinutes();
+		int second = date.getSeconds();
+		
+		String timezone = String.valueOf(date.getTimezoneOffset());
+		
+		return new Timestamp(year, month, day, hour, minute, second, timezone);
+	}
+	
 	/**
 	 * -1, wenn time früher (time vor time).
 	 * 0, wenn gleich.
