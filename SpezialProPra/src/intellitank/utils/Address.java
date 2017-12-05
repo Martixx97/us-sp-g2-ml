@@ -1,4 +1,4 @@
-package intellitank.main;
+package intellitank.utils;
 
 public class Address
 {

@@ -1,4 +1,4 @@
-package intellitank.main;
+package intellitank.utils;
 
 import java.util.HashMap;
 

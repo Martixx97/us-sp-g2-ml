@@ -1,8 +1,8 @@
-package intellitank.utils;
+package intellitank.main;
 
 import java.util.ArrayList;
 
-import intellitank.main.Timestamp;
+import intellitank.utils.Timestamp;
 
 public class Calculator
 {

@@ -2,7 +2,7 @@ package intellitank.utils;
 
 import java.util.HashMap;
 
-import intellitank.main.Timestamp;
+import intellitank.main.Reader;
 
 public class History
 {
