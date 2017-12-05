@@ -1,7 +1,6 @@
 package intellitank.utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import intellitank.main.Timestamp;
 
@@ -17,7 +16,7 @@ public class Calculator
 	public static String getPriceAt(String data)
 	{
 		String result = "";
-		
+		 
 		for(String line : data.split("\\|"))
 		{
 			String price = "";
