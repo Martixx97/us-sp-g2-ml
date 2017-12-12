@@ -1,5 +1,7 @@
 package intellitank.utils;
 
+import intellitank.main.Reader;
+
 public class Address
 {
 	String street;

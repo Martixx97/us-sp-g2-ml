@@ -2,6 +2,8 @@ package intellitank.utils;
 
 import java.sql.Date;
 
+import intellitank.main.Reader;
+
 public class Gasstation
 {
 	int id;

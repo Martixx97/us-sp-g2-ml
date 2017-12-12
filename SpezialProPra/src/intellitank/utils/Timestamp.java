@@ -130,6 +130,12 @@ public class Timestamp
 	public void setMonth(int month)
 	{
 		this.month = month;
+		
+		if(this.month > 12)
+		{
+			this.month = 0;
+			this.year += 1;
+		}
 	}
 
 	public int getDay()
@@ -140,6 +146,12 @@ public class Timestamp
 	public void setDay(int day)
 	{
 		this.day = day;
+		
+		if(this.day > 30)
+		{
+			this.day = 0;
+			setMonth(getMonth() + 1);
+		}
 	}
 
 	public int getHour()
@@ -150,6 +162,12 @@ public class Timestamp
 	public void setHour(int hour)
 	{
 		this.hour = hour;
+		
+		if(this.hour > 24)
+		{
+			this.hour = 0;
+			setDay(getDay() + 1);
+		}
 	}
 
 	public int getMinute()
@@ -160,6 +178,12 @@ public class Timestamp
 	public void setMinute(int minute)
 	{
 		this.minute = minute;
+		
+		if(this.minute > 60)
+		{
+			this.minute = 0;
+			setHour(getHour() + 1);
+		}
 	}
 
 	public int getSecond()
@@ -170,6 +194,12 @@ public class Timestamp
 	public void setSecond(int second)
 	{
 		this.second = second;
+		
+		if(this.second > 60)
+		{
+			this.second = 0;
+			setMinute(getMinute() + 1);
+		}
 	}
 
 	public String getTimezone()

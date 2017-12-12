@@ -2,6 +2,8 @@ package intellitank.utils;
 
 import java.util.HashMap;
 
+import intellitank.main.Reader;
+
 public class Route
 {
 	int capacity;

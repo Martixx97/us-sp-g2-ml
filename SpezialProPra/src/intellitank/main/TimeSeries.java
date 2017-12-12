@@ -13,9 +13,9 @@ public class TimeSeries
 		
 	}
 	
-	public Integer forecast(Timestamp time)
+	public int forecast(Timestamp time)
 	{
-		Integer result = 0;
+		int result = 0;
 		
 		// TODO //
 		
