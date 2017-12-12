@@ -22,6 +22,7 @@ public class Calculator
 		PriceList prices = PriceList.fromString("https://raw.githubusercontent.com/InformatiCup/InformatiCup2018/master/Eingabedaten/Benzinpreise/" + id +".csv");
 		prices.clean();
 		
+		// TODO //
 		
 		return result;
 	}
