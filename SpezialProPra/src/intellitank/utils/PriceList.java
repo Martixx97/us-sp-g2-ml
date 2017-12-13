@@ -34,7 +34,7 @@ public class PriceList
 		
 		int i = 0;
 		
-		while(currentTime.compare(lastTime) > 0);															// TODO //
+		while(currentTime.compare(lastTime) > 0)
 		{
 			System.out.println("[" + i + "] curr: " + currentTime + " | last: " + lastTime);
 			currentTime.setHour(currentTime.getHour() + 1);
