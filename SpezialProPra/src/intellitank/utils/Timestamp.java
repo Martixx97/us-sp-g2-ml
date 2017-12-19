@@ -121,6 +121,7 @@ public class Timestamp
 	{
 		setMinute(0);
 		setSecond(0);
+		setTimezone("+02");
 	}
 	
 	/**
