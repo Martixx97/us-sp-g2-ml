@@ -2,6 +2,7 @@ package intellitank;
 
 import intellitank.main.Calculator;
 import intellitank.utils.PriceList;
+import intellitank.utils.Timestamp;
 
 public class Intellitank
 {
@@ -10,9 +11,9 @@ public class Intellitank
 //		System.out.println(Calculator.getPriceAt("2015-02-10 12:18:01+01;2015-02-15 21:18:01+01;24"));
 		
 		System.out.println("start");
-		PriceList prices = PriceList.fromString("https://raw.githubusercontent.com/InformatiCup/InformatiCup2018/master/Eingabedaten/Benzinpreise/24.csv");
-		System.out.println("clean");
-		prices.clean();
+		
+		Calculator.forecastPrice(24, Timestamp.fromString("2015-02-10 12:18:01+01"), Timestamp.fromString("2015-02-15 21:18:01+01"));
+		
 		System.out.println("end");
 	}
 }

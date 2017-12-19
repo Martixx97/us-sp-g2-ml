@@ -99,8 +99,19 @@ public class Timestamp
 		return new Timestamp(year, month, day, hour, minute, second, timezone);
 	}
 	
+	public Timestamp clone()
+	{
+		return new Timestamp(this.year, this.month, this.day, this.hour, this.minute, this.second, this.timezone);
+	}
+	
+	public void clean()
+	{
+		this.setMinute(0);
+		this.setSecond(0);
+	}
+	
 	/**
-	 * -1, wenn time früher (time vor time).
+	 * -1, wenn time früher (time vor this).
 	 * 0, wenn gleich.
 	 * 1, wenn time später (time nach this).
 	 */
@@ -135,6 +146,10 @@ public class Timestamp
 		{
 			this.month = 0;
 			this.year += 1;
+		} else if(this.month < 1)
+		{
+			this.month += 12;
+			this.year -= 1;
 		}
 	}
 
@@ -149,8 +164,12 @@ public class Timestamp
 		
 		if(this.day > 30)
 		{
-			this.day = 0;
+			this.day = 1;
 			setMonth(getMonth() + 1);
+		} else if(this.day < 1)
+		{
+			this.day += 30;
+			setMonth(getMonth() - 1);
 		}
 	}
 
@@ -163,7 +182,7 @@ public class Timestamp
 	{
 		this.hour = hour;
 		
-		if(this.hour > 24)
+		if(this.hour > 23)
 		{
 			this.hour = 0;
 			setDay(getDay() + 1);

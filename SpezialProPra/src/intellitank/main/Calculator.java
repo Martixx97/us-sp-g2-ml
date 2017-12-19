@@ -2,6 +2,7 @@ package intellitank.main;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import intellitank.utils.PriceList;
 import intellitank.utils.Timestamp;
@@ -21,8 +22,28 @@ public class Calculator
 		
 		PriceList prices = PriceList.fromString("https://raw.githubusercontent.com/InformatiCup/InformatiCup2018/master/Eingabedaten/Benzinpreise/" + id +".csv");
 		prices.clean();
+		knowPrice.clean();
 		
-		// TODO //
+		int daysback = 5;
+		
+		Timestamp lastTime = knowPrice.clone();
+		lastTime.setDay(lastTime.getDay() - daysback);
+		
+		System.out.println(lastTime + " - " + knowPrice);
+		
+		LinkedHashMap<Timestamp, Integer> map = new LinkedHashMap<>();
+		
+		int i = 1;
+		
+		for(Timestamp time : prices.getValues().keySet())
+		{
+//			System.out.println("[" + i + "] " + time);
+			if(time.compare(lastTime) < 0 && time.compare(knowPrice) > 0) map.put(time, prices.getValues().get(time));
+			
+			i++;
+		}
+		
+//		System.out.println("map: " + map.toString());
 		
 		return result;
 	}

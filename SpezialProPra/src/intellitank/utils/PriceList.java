@@ -12,11 +12,7 @@ public class PriceList
 	public PriceList(LinkedHashMap<Timestamp, Integer> map)
 	{
 		values = new LinkedHashMap<>();
-		
-		for(Timestamp timestamp : map.keySet())
-		{
-			values.put(timestamp, map.get(timestamp));
-		}
+		values.putAll(map);
 	}
 	
 	public void clean()
@@ -26,29 +22,39 @@ public class PriceList
 			timestamp.setMinute(0);
 			timestamp.setSecond(0);
 		}
-
+		
 		Timestamp currentTime = (Timestamp) values.keySet().toArray()[0];
 		Integer currentPrice = (Integer) values.values().toArray()[0];
 		
 		Timestamp lastTime = (Timestamp) values.keySet().toArray()[values.keySet().toArray().length-1];
 		
-		int i = 0;
-		
+		LinkedHashMap<Timestamp, Integer> newValues = new LinkedHashMap<>();
+		System.out.println("old > " + values);
 		while(currentTime.compare(lastTime) > 0)
 		{
-			System.out.println("[" + i + "] curr: " + currentTime + " | last: " + lastTime);
 			currentTime.setHour(currentTime.getHour() + 1);
+			
+			Timestamp test = Timestamp.fromString("2017-9-21 22:0:0+02");
+			
+			if(test.compare(currentTime) == 0)
+			{
+				System.out.println(test + " ??? " + values.containsKey(test));
+				System.out.println("[" + values.get(currentTime) + "] " + currentTime + " ??? " + values.containsKey(currentTime));
+			}
 			
 			if(!values.containsKey(currentTime))
 			{
-				values.put(currentTime, currentPrice);
+				System.out.println("new put > " + currentTime);
+				newValues.put(currentTime, currentPrice);
 			} else
 			{
 				currentPrice = values.get(currentTime);
 			}
-			
-			i++;
 		}
+		
+//		values = newValues;
+		
+		System.out.println("new > " + newValues);
 	}
 	
 	public static PriceList fromString(String url)
