@@ -4,33 +4,46 @@ import java.util.Date;
 
 public class Timestamp
 {
-	int year;
-	int month;
-	int day;
+	private int year;
+	private int month;
+	private int day;
 	
-	int hour;
-	int minute;
-	int second;
+	private int hour;
+	private int minute;
+	private int second;
 	
-	String timezone;
+	private String timezone;
 
 	public Timestamp(int year, int month, int day, int hour, int minute, int second, String timezone)
 	{
-		this.year = year;
-		this.month = month;
-		this.day = day;
+		setYear(year);;
+		setMonth(month);
+		setDay(day);
 		
-		this.hour = hour;
-		this.minute = minute;
-		this.second = second;
+		setHour(hour);
+		setMinute(minute);
+		setSecond(second);
 		
-		this.timezone = timezone;
+		setTimezone(timezone);
 	}
 	
 	@Override
 	public String toString()
 	{
 		return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + timezone;
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if(obj instanceof Timestamp)
+		{
+			Timestamp time = (Timestamp) obj;
+			
+			return this.year == time.year && this.month == time.month && this.day == time.day && this.hour == time.hour && this.minute == time.minute && this.second == time.second && this.timezone.equalsIgnoreCase(time.timezone);
+		}
+		
+		return false;
 	}
 
 	public static Timestamp fromString(String date)
@@ -106,8 +119,8 @@ public class Timestamp
 	
 	public void clean()
 	{
-		this.setMinute(0);
-		this.setSecond(0);
+		setMinute(0);
+		setSecond(0);
 	}
 	
 	/**
@@ -144,7 +157,7 @@ public class Timestamp
 		
 		if(this.month > 12)
 		{
-			this.month = 0;
+			this.month = 1;
 			this.year += 1;
 		} else if(this.month < 1)
 		{

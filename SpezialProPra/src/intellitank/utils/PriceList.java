@@ -29,32 +29,37 @@ public class PriceList
 		Timestamp lastTime = (Timestamp) values.keySet().toArray()[values.keySet().toArray().length-1];
 		
 		LinkedHashMap<Timestamp, Integer> newValues = new LinkedHashMap<>();
-		System.out.println("old > " + values);
+		
+//		System.out.println("old > " + values);
+		System.out.println("---------------------------------------------------------------------------------");
+		
 		while(currentTime.compare(lastTime) > 0)
 		{
-			currentTime.setHour(currentTime.getHour() + 1);
+			currentTime = new Timestamp(currentTime.getYear(), currentTime.getMonth(), currentTime.getDay(), currentTime.getHour() + 1, currentTime.getMinute(), currentTime.getSecond(), currentTime.getTimezone());
 			
-			Timestamp test = Timestamp.fromString("2017-9-21 22:0:0+02");
+			Timestamp test = Timestamp.fromString("2014-6-9 3:0:0+02");
 			
-			if(test.compare(currentTime) == 0)
+			if(test.equals(currentTime))
 			{
-				System.out.println(test + " ??? " + values.containsKey(test));
-				System.out.println("[" + values.get(currentTime) + "] " + currentTime + " ??? " + values.containsKey(currentTime));
+				System.out.println("[test] " + test + " ??? " + values.containsKey(test));
+				System.out.println("[curr] " + currentTime + " ??? " + values.containsKey(currentTime));
 			}
 			
 			if(!values.containsKey(currentTime))
 			{
-				System.out.println("new put > " + currentTime);
 				newValues.put(currentTime, currentPrice);
+//				System.out.println("new put > " + currentTime);
 			} else
 			{
 				currentPrice = values.get(currentTime);
+				System.out.println("new price > " + currentPrice);
 			}
 		}
 		
-//		values = newValues;
-		
-		System.out.println("new > " + newValues);
+		values = newValues;
+
+		System.out.println("---------------------------------------------------------------------------------");
+//		System.out.println("new > " + values);
 	}
 	
 	public static PriceList fromString(String url)
@@ -69,6 +74,16 @@ public class PriceList
 		}
 		
 		return new PriceList(result);
+	}
+	
+	public boolean containsKey(Timestamp timestamp)
+	{
+		for(Timestamp time : values.keySet())
+		{
+			if(time.compare(timestamp) == 0) return true;
+		}
+		
+		return false;
 	}
 	
 	public String getPriceAt(Timestamp timestamp)
