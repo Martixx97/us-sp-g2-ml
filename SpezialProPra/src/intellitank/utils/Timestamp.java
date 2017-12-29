@@ -200,6 +200,10 @@ public class Timestamp
 		{
 			this.hour = 0;
 			setDay(getDay() + 1);
+		} else if(this.hour < 1)
+		{
+			this.hour += 23;
+			setDay(getDay() - 1);
 		}
 	}
 

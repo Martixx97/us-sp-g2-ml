@@ -3,6 +3,7 @@ package intellitank.main;
 import java.util.ArrayList;
 import java.util.List;
 
+import intellitank.Logger;
 import intellitank.utils.PriceList;
 import intellitank.utils.Timestamp;
 
@@ -17,8 +18,7 @@ public class Calculator
 	// tatsächlich: 2015-02-15 17:50:01+01;1309
 	public static int forecastPrice(int id, Timestamp knowPrice, Timestamp forecastTime)
 	{
-		int result = 0;
-		
+		int result = 0;		
 		int daysback = 7;
 		
 		Timestamp lastTime = knowPrice.clone();
@@ -31,17 +31,17 @@ public class Calculator
 		PriceList prices = PriceList.fromString("https://raw.githubusercontent.com/InformatiCup/InformatiCup2018/master/Eingabedaten/Benzinpreise/" + id +".csv");
 		prices.clean(lastTime.clone(), knowPrice.clone());
 		
-		int hour = forecastTime.getHour();
-
 		List<Integer> durchschnitte = new ArrayList<>();
 		
-		for(int i=lastTime.getDay(); i<knowPrice.getDay(); i++)
+		Timestamp currentTime = lastTime.clone();
+		
+		while(currentTime.compare(knowPrice) != 0)
 		{
 			for(int h=0; h<24; h++)
 			{
-				if(h == hour)
+				if(h == forecastTime.getHour())
 				{
-					Timestamp time = new Timestamp(forecastTime.getYear(), forecastTime.getMonth(), i, h, 0, 0, "+02");
+					Timestamp time = currentTime.clone();
 
 					int temp = 0;
 					
@@ -57,9 +57,11 @@ public class Calculator
 					durchschnitte.add(temp / 3);
 				}
 			}
+			
+			currentTime.setDay(currentTime.getDay() + 1);
 		}
 		
-		System.out.println("durchschnitte > " + durchschnitte);
+		Logger.log("durchschnitte > " + durchschnitte);
 		
 		if(!durchschnitte.isEmpty())
 		{
@@ -71,7 +73,7 @@ public class Calculator
 			result /= durchschnitte.size();
 		}
 		
-		System.out.println("result > " + result);
+		Logger.log("result > " + result);
 		
 		return result;
 	}
