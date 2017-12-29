@@ -25,7 +25,9 @@ public class Intellitank
 		
 		Logger.log("start");
 
-		Calculator.forecastPrice(24, Timestamp.fromString("2015-02-10 12:18:01+01"), Timestamp.fromString("2015-02-15 21:18:01+01"));
+		Calculator.forecastPrice(46, Timestamp.fromString("2016-03-22 10:42:01+01"), Timestamp.fromString("2016-03-22 10:43:01+01"));
+		
+		// 24, Timestamp.fromString("2015-02-10 12:18:01+01"), Timestamp.fromString("2015-02-15 21:18:01+01")
 		
 		Logger.log("end");
 	}

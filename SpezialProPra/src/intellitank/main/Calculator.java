@@ -31,7 +31,7 @@ public class Calculator
 		PriceList prices = PriceList.fromString("https://raw.githubusercontent.com/InformatiCup/InformatiCup2018/master/Eingabedaten/Benzinpreise/" + id +".csv");
 		prices.clean(lastTime.clone(), knowPrice.clone());
 		
-		List<Integer> durchschnitte = new ArrayList<>();
+		List<Integer> averages = new ArrayList<>();
 		
 		Timestamp currentTime = lastTime.clone();
 		
@@ -54,23 +54,23 @@ public class Calculator
 					time.setHour(time.getHour() + 1);
 					temp += prices.getPriceAt(time);
 
-					durchschnitte.add(temp / 3);
+					averages.add(temp / 3);
 				}
 			}
 			
 			currentTime.setDay(currentTime.getDay() + 1);
 		}
 		
-		Logger.log("durchschnitte > " + durchschnitte);
+		Logger.log("averages > " + averages);
 		
-		if(!durchschnitte.isEmpty())
+		if(!averages.isEmpty())
 		{
-			for(Integer value : durchschnitte)
+			for(Integer value : averages)
 			{
 				result += value;
 			}
 			
-			result /= durchschnitte.size();
+			result /= averages.size();
 		}
 		
 		Logger.log("result > " + result);
