@@ -18,12 +18,11 @@ public class Calculator
 	// tatsächlich: 2015-02-15 17:50:01+01;1309
 	public static int forecastPrice(int id, Timestamp knowPrice, Timestamp forecastTime)
 	{
-		int result = 0;		
+		int result = 0; 	
 		int daysback = 7;
 		
 		Timestamp lastTime = knowPrice.clone();
 		lastTime.setDay(lastTime.getDay() - daysback);
-		lastTime.setTimezone("+02");
 		lastTime.clean();
 		
 		knowPrice.clean();
