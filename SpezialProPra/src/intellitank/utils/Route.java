@@ -1,18 +1,41 @@
 package intellitank.utils;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
-import intellitank.main.Reader;
+import intellitank.Logger;
 
 public class Route
 {
-	int capacity;
-	HashMap<Timestamp, Integer> stops;
+	int current;
 	
-	public Route(int capacity, HashMap<Timestamp, Integer> stops)
+	int capacity;
+	
+	ArrayList<Timestamp> times;
+	ArrayList<Integer> stations;
+	
+	public Route(int capacity, LinkedHashMap<Timestamp, Integer> stops)
 	{
 		this.capacity = capacity;
-		this.stops = stops;
+		
+		for(Timestamp time : stops.keySet())
+		{
+			times.add(time);
+			stations.add(stops.get(time));
+		}
+		
+		current = 0;
+		
+		if(times.size() != stations.size()) Logger.error("ERROR 105 | different list size in Route");
+	}
+	
+	public double distanceToNext()
+	{
+		double distance = 0.0d;
+		
+		// TODO //
+		
+		return distance;
 	}
 
 	public int getCapacity()
@@ -20,9 +43,29 @@ public class Route
 		return capacity;
 	}
 
-	public HashMap<Timestamp, Integer> getStops()
+	public int getCurrent()
 	{
-		return stops;
+		return current;
+	}
+	
+	public boolean hasNext()
+	{
+		return times.size() >= (current + 1);
+	}
+	
+	public void next()
+	{
+		if(hasNext()) current++;
+	}
+	
+	public Timestamp getCurrentTime()
+	{
+		return times.get(current);
+	}
+	
+	public int getCurrentStation()
+	{
+		return stations.get(current);
 	}
 	
 	@Override
@@ -30,10 +73,10 @@ public class Route
 	{
 		String stopString = "";
 		
-		for(Timestamp time : stops.keySet())
+		for(int i=0; i<times.size(); i++)
 		{
-			if(stopString.isEmpty()) stopString = time + ";" + stops.get(time);
-			else stopString += "|" + time + ";" + stops.get(time);
+			if(stopString.isEmpty()) stopString = times.get(i) + ";" + stations.get(i);
+			else stopString += "|" + times.get(i) + ";" + stations.get(i);
 		}
 		
 		return capacity + "|" + stopString;
@@ -42,7 +85,7 @@ public class Route
 	public static Route fromString(String data)
 	{
 		int capacity = 0;
-		HashMap<Timestamp, Integer> stops = new HashMap<>();
+		LinkedHashMap<Timestamp, Integer> stops = new LinkedHashMap<>();
 		
 		String[] split = data.split("\\|");
 		
@@ -61,7 +104,7 @@ public class Route
 				stops.put(Timestamp.fromString(split[i].split(";")[0]), Integer.valueOf(split[i].split(";")[1]));
 			} catch (NumberFormatException exception)
 			{
-				exception.printStackTrace();
+				Logger.error("ERROR 102 | " + exception.toString());
 			}
 		}
 		

@@ -1,5 +1,6 @@
 package intellitank.utils;
 
+import intellitank.Logger;
 import intellitank.main.Reader;
 
 public class Address
@@ -52,7 +53,7 @@ public class Address
 				longitude = Float.valueOf(data.split(";")[5]);
 			} catch (NumberFormatException exception)
 			{
-				exception.printStackTrace();
+				Logger.error("ERROR 102 | " + exception.toString());
 			}
 		}
 		

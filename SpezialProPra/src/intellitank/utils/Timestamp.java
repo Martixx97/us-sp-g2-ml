@@ -2,6 +2,8 @@ package intellitank.utils;
 
 import java.util.Date;
 
+import intellitank.Logger;
+
 public class Timestamp
 {
 	private int year;
@@ -85,7 +87,7 @@ public class Timestamp
 				}
 			} catch (NumberFormatException exception)
 			{
-				exception.printStackTrace();
+				Logger.error("ERROR 102 | " + exception.toString());
 			}
 		}
 		

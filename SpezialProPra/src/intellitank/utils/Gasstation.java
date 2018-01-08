@@ -99,6 +99,4 @@ public class Gasstation
 	{
 		this.address = address;
 	}
-	
-	
 }

@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
 
+import intellitank.Logger;
 import intellitank.utils.Timestamp;
 
 public class Reader
@@ -30,7 +31,7 @@ public class Reader
 			breader.close();
 		} catch (IOException exception)
 		{
-			exception.printStackTrace();
+			Logger.error("ERROR 103 | " + exception.toString());
 			return null;
 		}
 		
