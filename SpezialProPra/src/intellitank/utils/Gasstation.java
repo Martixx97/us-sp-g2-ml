@@ -2,6 +2,8 @@ package intellitank.utils;
 
 import java.sql.Date;
 
+import intellitank.Logger;
+import intellitank.main.DataStorage;
 import intellitank.main.Reader;
 
 public class Gasstation
@@ -45,7 +47,7 @@ public class Gasstation
 				id = Integer.valueOf(data.split(";")[0]);
 			} catch (NumberFormatException exception)
 			{
-				exception.printStackTrace();
+				Logger.error("ERROR 102 | " + exception.toString());
 			}
 			
 			name = data.split(";")[1];
@@ -65,7 +67,29 @@ public class Gasstation
 		return new Gasstation(id, name, brand, address);
 	}
 	
-	public int getId()
+	public static Gasstation fromID(int id)
+	{
+		if(id != 0)
+		{
+			String data = Reader.readURL(DataStorage.getStationList());
+			
+			String[] split = data.split("\\|");
+			
+			for(int i=0; i<split.length; i++)
+			{
+				Gasstation station = Gasstation.fromString(split[i]);
+				
+				if(station.getID() == id) return station;
+			}
+		} else
+		{
+			Logger.error("ERROR 106 | gas station id cannot be 0");
+		}
+		
+		return null;
+	}
+	
+	public int getID()
 	{
 		return id;
 	}

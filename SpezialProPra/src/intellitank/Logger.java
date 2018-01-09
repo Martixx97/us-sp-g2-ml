@@ -2,6 +2,11 @@ package intellitank;
 
 public class Logger
 {
+	// TODO //
+	// > make not static
+	// > add jTextArea object for console
+	// > add console output
+	
 	public static boolean debug = false;
 	
 	public static void log(String msg)

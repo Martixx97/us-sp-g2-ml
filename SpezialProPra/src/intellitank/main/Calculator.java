@@ -9,13 +9,6 @@ import intellitank.utils.Timestamp;
 
 public class Calculator
 {
-	// 1.	YYYY-MM-DD HH:MM:SS+HH bis zu dem Sie die Benzinpreise als bekannt annehmen und für Ihre Berechnungen verwenden dürfen
-	// 2.	geforderten	Zeitpunkt für die Vorhersage
-	// 3.	Tankstellen-ID für die Vorhersage
-	
-	// 2015-02-10 12:18:01+01	;	2015-02-15 21:18:01+01	;	24
-	
-	// tatsächlich: 2015-02-15 17:50:01+01;1309
 	public static int forecastPrice(int id, Timestamp knowPrice, Timestamp forecastTime)
 	{
 		int result = 0; 	
@@ -27,7 +20,7 @@ public class Calculator
 		
 		knowPrice.clean();
 		
-		PriceList prices = PriceList.fromString("https://raw.githubusercontent.com/InformatiCup/InformatiCup2018/master/Eingabedaten/Benzinpreise/" + id +".csv");
+		PriceList prices = PriceList.fromString(DataStorage.getStationPriceList(id));
 		prices.clean(lastTime.clone(), knowPrice.clone());
 		
 		List<Integer> averages = new ArrayList<>();

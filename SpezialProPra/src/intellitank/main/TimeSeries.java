@@ -10,7 +10,8 @@ public class TimeSeries
 	
 	public TimeSeries()
 	{
-		
+		// TODO ? //
+		// > is this class still needed? I don't think so
 	}
 	
 	public int forecast(Timestamp time)

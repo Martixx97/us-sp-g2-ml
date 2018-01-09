@@ -2,8 +2,10 @@ package intellitank.utils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.function.LongConsumer;
 
 import intellitank.Logger;
+import intellitank.main.DataStorage;
 
 public class Route
 {
@@ -31,11 +33,21 @@ public class Route
 	
 	public double distanceToNext()
 	{
-		double distance = 0.0d;
+		if(hasNext())
+		{
+			Gasstation currentStation = Gasstation.fromID(getCurrentStationID());
+			Gasstation nextStation = Gasstation.fromID(getNextStationID());
+			
+			float latCurrent = currentStation.getAddress().getLatitude();
+			float lonCurrent = currentStation.getAddress().getLongitude();
+			
+			float latNext = nextStation.getAddress().getLatitude();
+			float lonNext = nextStation.getAddress().getLongitude();
+			
+			return 6378.388 * Math.acos(Math.sin(latCurrent) * Math.sin(latNext) + Math.cos(latCurrent) * Math.cos(latNext) * Math.cos(lonNext - lonCurrent));
+		}
 		
-		// TODO //
-		
-		return distance;
+		return 0.0d;
 	}
 
 	public int getCapacity()
@@ -63,9 +75,19 @@ public class Route
 		return times.get(current);
 	}
 	
-	public int getCurrentStation()
+	public Timestamp getNextTime()
+	{
+		return hasNext() ? times.get(current + 1) : null;
+	}
+	
+	public int getCurrentStationID()
 	{
 		return stations.get(current);
+	}
+	
+	public int getNextStationID()
+	{
+		return hasNext() ? stations.get(current + 1) : 0;
 	}
 	
 	@Override
@@ -94,7 +116,7 @@ public class Route
 			capacity = Integer.valueOf(split[0]);
 		} catch (NumberFormatException exception)
 		{
-			exception.printStackTrace();
+			Logger.error("ERROR 102 | " + exception.toString());
 		}
 		
 		for(int i=1; i<split.length; i++)
