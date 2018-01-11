@@ -14,7 +14,7 @@ public class Timestamp
 
 	public Timestamp(int year, int month, int day, int hour, int minute, int second, String timezone)
 	{
-		setYear(year);;
+		setYear(year);
 		setMonth(month);
 		setDay(day);
 		

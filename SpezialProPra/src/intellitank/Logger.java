@@ -22,7 +22,7 @@ public class Logger
 		console.setEditable(false);
 	}
 	
-	public boolean isDebug()
+	public boolean isDebugActive()
 	{
 		return debug;
 	}
