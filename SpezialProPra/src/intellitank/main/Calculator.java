@@ -3,6 +3,7 @@ package intellitank.main;
 import java.util.ArrayList;
 import java.util.List;
 
+import intellitank.Intellitank;
 import intellitank.Logger;
 import intellitank.utils.PriceList;
 import intellitank.utils.Timestamp;
@@ -11,8 +12,7 @@ public class Calculator
 {
 	public static int forecastPrice(int id, Timestamp knowPrice, Timestamp forecastTime)
 	{
-		int result = 0; 	
-		int daysback = 7;
+		int result = 0, daysback = 7;
 		
 		Timestamp lastTime = knowPrice.clone();
 		lastTime.setDay(lastTime.getDay() - daysback);
@@ -20,7 +20,7 @@ public class Calculator
 		
 		knowPrice.clean();
 		
-		PriceList prices = PriceList.fromString(DataStorage.getStationPriceList(id));
+		PriceList prices = PriceList.fromString(id);
 		prices.clean(lastTime.clone(), knowPrice.clone());
 		
 		List<Integer> averages = new ArrayList<>();
@@ -53,7 +53,7 @@ public class Calculator
 			currentTime.setDay(currentTime.getDay() + 1);
 		}
 		
-		Logger.log("averages > " + averages);
+		Intellitank.logger.log("averages > " + averages);
 		
 		if(!averages.isEmpty())
 		{
@@ -65,7 +65,7 @@ public class Calculator
 			result /= averages.size();
 		}
 		
-		Logger.log("result > " + result);
+		Intellitank.logger.log("result > " + result);
 		
 		return result;
 	}

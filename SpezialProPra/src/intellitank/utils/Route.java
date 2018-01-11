@@ -4,17 +4,19 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.function.LongConsumer;
 
+import intellitank.Intellitank;
 import intellitank.Logger;
 import intellitank.main.DataStorage;
 
 public class Route
-{
-	int current;
+{	
+	private int capacity;
 	
-	int capacity;
+	private ArrayList<Timestamp> times;
+	private ArrayList<RouteGasstation> stations;
 	
-	ArrayList<Timestamp> times;
-	ArrayList<Integer> stations;
+	private int index;
+	private RouteGasstation current;
 	
 	public Route(int capacity, LinkedHashMap<Timestamp, Integer> stops)
 	{
@@ -23,28 +25,42 @@ public class Route
 		for(Timestamp time : stops.keySet())
 		{
 			times.add(time);
-			stations.add(stops.get(time));
+			stations.add(new RouteGasstation(Gasstation.fromID(stops.get(time))));
 		}
 		
-		current = 0;
+		this.index = 0;
+		this.current = stations.get(index);
 		
-		if(times.size() != stations.size()) Logger.error("ERROR 105 | different list size in Route");
+		if(times.size() != stations.size()) Intellitank.logger.error("ERROR 105 | different list size in Route");
+	}
+	
+	public double distanceToPrevious()
+	{
+		if(current.hasPrevious())
+		{
+			float latA = current.getPrevious().getAddress().getLatitude();
+			float lonA = current.getPrevious().getAddress().getLongitude();
+			
+			float latB = current.getAddress().getLatitude();
+			float lonB = current.getAddress().getLongitude();
+			
+			return 6378.388 * Math.acos(Math.sin(latA) * Math.sin(latB) + Math.cos(latA) * Math.cos(latB) * Math.cos(lonB - lonA));
+		}
+		
+		return 0.0d;
 	}
 	
 	public double distanceToNext()
 	{
-		if(hasNext())
+		if(current.hasNext())
 		{
-			Gasstation currentStation = Gasstation.fromID(getCurrentStationID());
-			Gasstation nextStation = Gasstation.fromID(getNextStationID());
+			float latA = current.getAddress().getLatitude();
+			float lonA = current.getAddress().getLongitude();
 			
-			float latCurrent = currentStation.getAddress().getLatitude();
-			float lonCurrent = currentStation.getAddress().getLongitude();
+			float latB = current.getNext().getAddress().getLatitude();
+			float lonB = current.getNext().getAddress().getLongitude();
 			
-			float latNext = nextStation.getAddress().getLatitude();
-			float lonNext = nextStation.getAddress().getLongitude();
-			
-			return 6378.388 * Math.acos(Math.sin(latCurrent) * Math.sin(latNext) + Math.cos(latCurrent) * Math.cos(latNext) * Math.cos(lonNext - lonCurrent));
+			return 6378.388 * Math.acos(Math.sin(latA) * Math.sin(latB) + Math.cos(latA) * Math.cos(latB) * Math.cos(lonB - lonA));
 		}
 		
 		return 0.0d;
@@ -55,39 +71,33 @@ public class Route
 		return capacity;
 	}
 
-	public int getCurrent()
+	public RouteGasstation getCurrent()
 	{
 		return current;
 	}
 	
-	public boolean hasNext()
-	{
-		return times.size() >= (current + 1);
-	}
-	
 	public void next()
 	{
-		if(hasNext()) current++;
+		if(current.hasNext())
+		{
+			current = current.getNext();
+			index++;
+		}
 	}
 	
 	public Timestamp getCurrentTime()
 	{
-		return times.get(current);
+		return times.get(index);
+	}
+	
+	public Timestamp getPreviousTime()
+	{
+		return current.hasPrevious() ? times.get(index - 1) : null;
 	}
 	
 	public Timestamp getNextTime()
 	{
-		return hasNext() ? times.get(current + 1) : null;
-	}
-	
-	public int getCurrentStationID()
-	{
-		return stations.get(current);
-	}
-	
-	public int getNextStationID()
-	{
-		return hasNext() ? stations.get(current + 1) : 0;
+		return current.hasNext() ? times.get(index + 1) : null;
 	}
 	
 	@Override
@@ -106,30 +116,37 @@ public class Route
 	
 	public static Route fromString(String data)
 	{
-		int capacity = 0;
-		LinkedHashMap<Timestamp, Integer> stops = new LinkedHashMap<>();
-		
-		String[] split = data.split("\\|");
-		
-		try
+		if(!data.isEmpty())
 		{
-			capacity = Integer.valueOf(split[0]);
-		} catch (NumberFormatException exception)
-		{
-			Logger.error("ERROR 102 | " + exception.toString());
-		}
-		
-		for(int i=1; i<split.length; i++)
-		{
+			int capacity = 0;
+			LinkedHashMap<Timestamp, Integer> stops = new LinkedHashMap<>();
+			
+			String[] split = data.split("\\|");
+			
 			try
 			{
-				stops.put(Timestamp.fromString(split[i].split(";")[0]), Integer.valueOf(split[i].split(";")[1]));
+				capacity = Integer.valueOf(split[0]);
 			} catch (NumberFormatException exception)
 			{
-				Logger.error("ERROR 102 | " + exception.toString());
+				Intellitank.logger.throwNumberFormat(exception);
 			}
+			
+			for(int i=1; i<split.length; i++)
+			{
+				try
+				{
+					stops.put(Timestamp.fromString(split[i].split(";")[0]), Integer.valueOf(split[i].split(";")[1]));
+				} catch (NumberFormatException exception)
+				{
+					Intellitank.logger.throwNumberFormat(exception);
+				}
+			}
+			
+			return new Route(capacity, stops);
+		} else
+		{
+			Intellitank.logger.throwInvalidDataInput("Route.fromString(...)");
+			return null;
 		}
-		
-		return new Route(capacity, stops);
 	}
 }

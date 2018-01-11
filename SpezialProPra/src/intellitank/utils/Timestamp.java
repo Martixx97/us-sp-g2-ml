@@ -2,17 +2,13 @@ package intellitank.utils;
 
 import java.util.Date;
 
+import intellitank.Intellitank;
 import intellitank.Logger;
 
 public class Timestamp
 {
-	private int year;
-	private int month;
-	private int day;
-	
-	private int hour;
-	private int minute;
-	private int second;
+	private int year, month, day;	
+	private int hour, minute, second;
 	
 	private String timezone;
 
@@ -50,18 +46,13 @@ public class Timestamp
 
 	public static Timestamp fromString(String date)
 	{
-		int year = 0;
-		int month = 0;
-		int day = 0;
-		
-		int hour = 0;
-		int minute = 0;
-		int second = 0;
-		
-		String timezone = "";
-		
 		if(!date.isEmpty())
 		{
+			int year = 0, month = 0, day = 0;		
+			int hour = 0, minute = 0, second = 0;
+			
+			String timezone = "";
+			
 			String ymd = date.split(" ")[0];
 			String hmst = date.split(" ")[1];
 
@@ -87,11 +78,14 @@ public class Timestamp
 				}
 			} catch (NumberFormatException exception)
 			{
-				Logger.error("ERROR 102 | " + exception.toString());
 			}
+			
+			return new Timestamp(year, month, day, hour, minute, second, timezone);
+		} else
+		{
+			Intellitank.logger.throwInvalidDataInput("Timestamp.fromString(...)");
+			return null;
 		}
-		
-		return new Timestamp(year, month, day, hour, minute, second, timezone);
 	}
 	
 	public Date toDate()
@@ -101,13 +95,8 @@ public class Timestamp
 	
 	public static Timestamp fromDate(Date date)
 	{
-		int year = date.getYear();
-		int month = date.getMonth();
-		int day = date.getDate();
-		
-		int hour = date.getHours();
-		int minute = date.getMinutes();
-		int second = date.getSeconds();
+		int year = date.getYear(), month = date.getMonth(), day = date.getDate();		
+		int hour = date.getHours(), minute = date.getMinutes(), second = date.getSeconds();
 		
 		String timezone = String.valueOf(date.getTimezoneOffset());
 		
@@ -127,9 +116,7 @@ public class Timestamp
 	}
 	
 	/**
-	 * -1, wenn time früher (time vor this).
-	 * 0, wenn gleich.
-	 * 1, wenn time später (time nach this).
+	 * @return -1, wenn time früher (time vor this). 0, wenn gleich. 1, wenn time später (time nach this).
 	 */
 	public int compare(Timestamp time)
 	{
@@ -147,6 +134,8 @@ public class Timestamp
 	public void setYear(int year)
 	{
 		this.year = year;
+		
+		if(year < 1990 || year > 2030) Intellitank.logger.warning("unrealistic year was set in a timestamp");
 	}
 
 	public int getMonth()

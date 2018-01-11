@@ -3,7 +3,9 @@ package intellitank.utils;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import intellitank.Intellitank;
 import intellitank.Logger;
+import intellitank.main.DataStorage;
 import intellitank.main.Reader;
 
 public class PriceList
@@ -32,48 +34,45 @@ public class PriceList
 		
 		LinkedHashMap<Timestamp, Integer> newValues = new LinkedHashMap<>();
 		
-//		Logger.log("old > " + values);
-//		Logger.log("---------------------------------------------------------------------------------");
-		
 		while(currentTime.compare(lastTime) > 0)
 		{
 			currentTime = new Timestamp(currentTime.getYear(), currentTime.getMonth(), currentTime.getDay(), currentTime.getHour() + 1, currentTime.getMinute(), currentTime.getSecond(), "+02");
 			
-			if(currentPrice != null) newValues.put(currentTime, currentPrice);
-//			Logger.log("new put > " + currentTime + ", " + currentPrice);
-			
-			if(containsKey(currentTime))
-			{
-				currentPrice = getPriceAt(currentTime);
-//				Logger.log("new price > " + currentPrice);
-			}
+			if(currentPrice != null) newValues.put(currentTime, currentPrice);			
+			if(containsKey(currentTime)) currentPrice = getPriceAt(currentTime);
 		}
 		
 		values = newValues;
-
-//		Logger.log("---------------------------------------------------------------------------------");
-//		Logger.log("new > " + values);
 	}
 	
-	public static PriceList fromString(String url)
+	public static PriceList fromString(int gasstation)
 	{
-		LinkedHashMap<Timestamp, Integer> result = new LinkedHashMap<>();
-		
-		String[] rawData = Reader.readURL(url).split("\\|");
-		
-		for(int i = 0; i < rawData.length; i++)
+		if(gasstation > 0 || gasstation < 15226)
 		{
-			result.put(Timestamp.fromString(rawData[i].split(";")[0]), Integer.valueOf((rawData[i].split(";")[1])));
+			String url = DataStorage.getStationPriceList(gasstation);
+			
+			LinkedHashMap<Timestamp, Integer> result = new LinkedHashMap<>();
+			
+			String[] rawData = Reader.readURL(url).split("\\|");
+			
+			for(int i = 0; i < rawData.length; i++)
+			{
+				result.put(Timestamp.fromString(rawData[i].split(";")[0]), Integer.valueOf((rawData[i].split(";")[1])));
+			}
+			
+			return new PriceList(result);
+		} else
+		{
+			Intellitank.logger.throwInvalidGasstationID(gasstation);
+			return null;
 		}
-		
-		return new PriceList(result);
 	}
 	
 	public boolean containsKey(Timestamp timestamp)
 	{
 		for(Timestamp time : values.keySet())
 		{
-			if(time.compare(timestamp)  == 0) return true;
+			if(time.compare(timestamp) == 0) return true;
 		}
 		
 		return false;

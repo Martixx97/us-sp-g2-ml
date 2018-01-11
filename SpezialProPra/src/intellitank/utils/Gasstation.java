@@ -2,18 +2,18 @@ package intellitank.utils;
 
 import java.sql.Date;
 
+import intellitank.Intellitank;
 import intellitank.Logger;
 import intellitank.main.DataStorage;
 import intellitank.main.Reader;
 
 public class Gasstation
 {
-	int id;
+	private int id;
 	
-	String name;
-	String brand;
+	private String name, brand;
 	
-	Address address;
+	private Address address;
 	
 	public Gasstation(int id, String name, String brand, Address address)
 	{
@@ -33,21 +33,20 @@ public class Gasstation
 	
 	public static Gasstation fromString(String data)
 	{
-		int id = 0;
-		
-		String name = "";
-		String brand = "";
-		
-		Address address = null;
-		
 		if(!data.isEmpty())
 		{
+			int id = 0;
+			
+			String name = "", brand = "";
+			
+			Address address = null;
+			
 			try
 			{
 				id = Integer.valueOf(data.split(";")[0]);
 			} catch (NumberFormatException exception)
 			{
-				Logger.error("ERROR 102 | " + exception.toString());
+				Intellitank.logger.throwNumberFormat(exception);
 			}
 			
 			name = data.split(";")[1];
@@ -62,14 +61,18 @@ public class Gasstation
 			}
 			
 			address = Address.fromString(addressData);
+			
+			return new Gasstation(id, name, brand, address);
+		} else
+		{
+			Intellitank.logger.throwInvalidDataInput("Gasstation.fromString(...)");
+			return null;
 		}
-		
-		return new Gasstation(id, name, brand, address);
 	}
 	
 	public static Gasstation fromID(int id)
 	{
-		if(id != 0)
+		if(id > 0 || id < 15226)
 		{
 			String data = Reader.readURL(DataStorage.getStationList());
 			
@@ -81,12 +84,13 @@ public class Gasstation
 				
 				if(station.getID() == id) return station;
 			}
+			
+			return null;
 		} else
 		{
-			Logger.error("ERROR 106 | gas station id cannot be 0");
+			Intellitank.logger.throwInvalidGasstationID(id);			
+			return null;
 		}
-		
-		return null;
 	}
 	
 	public int getID()

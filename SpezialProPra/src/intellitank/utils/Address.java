@@ -1,17 +1,15 @@
 package intellitank.utils;
 
+import intellitank.Intellitank;
 import intellitank.Logger;
 import intellitank.main.Reader;
 
 public class Address
 {
-	String street;
-	int housenumber;
-	int zip;
-	String city;
+	private String street, city;
+	private int housenumber, zip;
 	
-	float latitude;
-	float longitude;
+	private float latitude, longitude;
 	
 	public Address(String street, int housenumber, int zip, String city, float latitude, float longitude)
 	{
@@ -32,16 +30,12 @@ public class Address
 	
 	public static Address fromString(String data)
 	{
-		String street = "";
-		int housenumber = 0;
-		int zip = 0;
-		String city = "";
-		
-		float latitude = 0f;
-		float longitude = 0f;
-		
 		if(!data.isEmpty())
 		{
+			String street = "", city = "";
+			int housenumber = 0, zip = 0;
+			
+			float latitude = 0f, longitude = 0f;
 			try
 			{
 				street = data.split(";")[0];
@@ -53,11 +47,15 @@ public class Address
 				longitude = Float.valueOf(data.split(";")[5]);
 			} catch (NumberFormatException exception)
 			{
-				Logger.error("ERROR 102 | " + exception.toString());
+				Intellitank.logger.throwNumberFormat(exception);
 			}
+			
+			return new Address(street, housenumber, zip, city, latitude, longitude);
+		} else
+		{
+			Intellitank.logger.throwInvalidDataInput("Address.fromString(...)");
+			return null;
 		}
-		
-		return new Address(street, housenumber, zip, city, latitude, longitude);
 	}
 
 	public String getStreet()
@@ -118,7 +116,5 @@ public class Address
 	public void setLongitude(float longitude)
 	{
 		this.longitude = longitude;
-	}
-	
-	
+	}	
 }
