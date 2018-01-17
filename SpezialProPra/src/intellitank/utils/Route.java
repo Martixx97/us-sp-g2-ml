@@ -1,7 +1,6 @@
 package intellitank.utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import intellitank.Intellitank;
@@ -9,28 +8,31 @@ import intellitank.main.Calculator;
 
 public class Route
 {	
-	private int capacity;
-	
 	private double currentTank;
+	private double maxTank;
+	
 	private double maxDistance;
 	
-	private ArrayList<Timestamp> times;
+	private LinkedHashMap<RouteGasstation, Timestamp> times;
+
 	private ArrayList<RouteGasstation> stations;
 	
-	private int index;
-	private RouteGasstation current;
-	
-	public Route(int capacity, LinkedHashMap<Timestamp, Integer> stops)
+	public Route(int maxTank, LinkedHashMap<Timestamp, Integer> stops)
 	{
-		this.capacity = capacity;
+		this.maxTank = maxTank;		
+		this.currentTank = 0;
 		
-		this.times = new ArrayList<>();
+		this.maxDistance = maxTank / 5.6 * 100;
+		
+		this.times = new LinkedHashMap<RouteGasstation, Timestamp>();
 		this.stations = new ArrayList<>();
 		
 		for(Timestamp time : stops.keySet())
 		{
-			times.add(time);		
-			stations.add(new RouteGasstation(Intellitank.gasStationList.get(stops.get(time))));
+			RouteGasstation gasStation = new RouteGasstation(Intellitank.gasStationList.get(stops.get(time)));
+			
+			times.put(gasStation, time);		
+			stations.add(gasStation);
 		}
 		
 		for(int i=0; i<stations.size(); i++)
@@ -41,136 +43,7 @@ public class Route
 			if(i < (stations.size() - 1)) gasStation.setNext(stations.get(i + 1));
 		}
 		
-		this.index = 0;
-		this.current = stations.get(index);
-		
-		this.currentTank = 0;
-		this.maxDistance = capacity / 5.6 * 100;
-		
 		if(times.size() != stations.size()) Intellitank.logger.error("ERROR 105 | different list size in Route");
-	}
-	
-	public LinkedHashMap<RouteGasstation, Double> getTankResults()
-	{
-		LinkedHashMap<RouteGasstation, Double> results = new LinkedHashMap<>();
-		
-		RouteGasstation curr = stations.get(0);
-		
-		while(curr != stations.get(stations.size() - 1))
-		{
-			if(distanceToEnd() <= maxDistance)
-			{
-				results.put(curr, getGasConsume(distanceToEnd()) - currentTank);
-
-				currentTank -= getGasConsume(distanceToNext());
-				curr = stations.get(stations.size() - 1);
-			} else
-			{
-				results.put(curr, capacity - currentTank);
-				currentTank = capacity - currentTank;
-
-				currentTank -= getGasConsume(distanceToNext());
-				curr = nextCheapest(curr);
-			}
-		}
-		
-		return results;
-	}
-	
-	private RouteGasstation nextCheapest(RouteGasstation gasstation)
-	{
-		RouteGasstation cheapest = gasstation.getNext();
-		
-		while(gasstation.hasNext())
-		{
-			if(Calculator.forecastPrice(gasstation.getNext().getID(), times.get(index + 1), times.get(index + 1)) <= Calculator.forecastPrice(gasstation.getID(), times.get(index), times.get(index))) cheapest = gasstation;
-			
-			gasstation = gasstation.getNext();
-		}
-		
-		return cheapest;
-	}
-	
-	private double getGasConsume(double distance)
-	{
-		return distance * (5.6 / 100);
-	}
-	
-	public double distanceToPrevious()
-	{
-		if(current.hasPrevious())
-		{
-			float latA = current.getPrevious().getAddress().getLatitude();
-			float lonA = current.getPrevious().getAddress().getLongitude();
-			
-			float latB = current.getAddress().getLatitude();
-			float lonB = current.getAddress().getLongitude();
-			
-			return 6378.388 * Math.acos(Math.sin(latA) * Math.sin(latB) + Math.cos(latA) * Math.cos(latB) * Math.cos(lonB - lonA));
-		}
-		
-		return 0.0d;
-	}
-	
-	public double distanceToNext()
-	{
-		if(current.hasNext())
-		{
-			float latA = current.getAddress().getLatitude();
-			float lonA = current.getAddress().getLongitude();
-			
-			float latB = current.getNext().getAddress().getLatitude();
-			float lonB = current.getNext().getAddress().getLongitude();
-			
-			return 6378.388 * Math.acos(Math.sin(latA) * Math.sin(latB) + Math.cos(latA) * Math.cos(latB) * Math.cos(lonB - lonA));
-		}
-		
-		return 0.0d;
-	}
-	
-	public double distanceToEnd()
-	{
-		float latA = current.getAddress().getLatitude();
-		float lonA = current.getAddress().getLongitude();
-			
-		float latB = stations.get(stations.size() - 1).getAddress().getLatitude();
-		float lonB = stations.get(stations.size() - 1).getAddress().getLongitude();
-			
-		return 6378.388 * Math.acos(Math.sin(latA) * Math.sin(latB) + Math.cos(latA) * Math.cos(latB) * Math.cos(lonB - lonA));
-	}
-
-	public int getCapacity()
-	{
-		return capacity;
-	}
-
-	public RouteGasstation getCurrent()
-	{
-		return current;
-	}
-	
-	public void next()
-	{
-		if(current.hasNext())
-		{
-			current = current.getNext();
-			index++;
-		}
-	}
-	
-	public Timestamp getCurrentTime()
-	{
-		return times.get(index);
-	}
-	
-	public Timestamp getPreviousTime()
-	{
-		return current.hasPrevious() ? times.get(index - 1) : null;
-	}
-	
-	public Timestamp getNextTime()
-	{
-		return current.hasNext() ? times.get(index + 1) : null;
 	}
 	
 	@Override
@@ -184,21 +57,21 @@ public class Route
 			else stopString += "|" + times.get(i) + ";" + stations.get(i);
 		}
 		
-		return capacity + "|" + stopString;
+		return maxTank + "|" + stopString;
 	}
 	
 	public static Route fromString(String data)
 	{
 		if(!data.isEmpty())
 		{
-			int capacity = 0;
+			int maxTank = 0;
 			LinkedHashMap<Timestamp, Integer> stops = new LinkedHashMap<>();
 			
 			String[] line = data.split("\\|");
 			
 			try
 			{
-				capacity = Integer.valueOf(line[0]);
+				maxTank = Integer.valueOf(line[0]);
 			} catch (NumberFormatException exception)
 			{
 				Intellitank.logger.throwNumberFormat(exception);
@@ -215,11 +88,84 @@ public class Route
 				}
 			}
 			
-			return new Route(capacity, stops);
+			return new Route(maxTank, stops);
 		} else
 		{
 			Intellitank.logger.throwInvalidDataInput("Route.fromString(...)");
 			return null;
 		}
+	}
+	
+	public LinkedHashMap<RouteGasstation, Double> getTankResults()
+	{
+		LinkedHashMap<RouteGasstation, Double> results = new LinkedHashMap<>();
+		
+		RouteGasstation curr = stations.get(0);
+		
+		while(curr != stations.get(stations.size() - 1))
+		{
+			if(distanceToEnd(curr) <= maxDistance)
+			{System.err.println("if");
+				results.put(curr, getGasConsume(distanceToEnd(curr)) - currentTank);
+
+				currentTank -= getGasConsume(distanceToEnd(curr));
+				curr = stations.get(stations.size() - 1);
+			} else
+			{System.err.println("else");
+				results.put(curr, maxTank - currentTank);
+				currentTank = maxTank - currentTank;
+
+				RouteGasstation cheapest = nextCheapest(curr);
+				System.err.println(cheapest.getID());
+				currentTank -= getGasConsume(distanceBetween(curr, cheapest));
+				curr = cheapest;
+			}
+		}
+		
+		return results;
+	}
+	
+	private RouteGasstation nextCheapest(RouteGasstation gasstation)
+	{
+		RouteGasstation currentStation = gasstation;
+		RouteGasstation cheapest = currentStation.getNext();
+		
+		while(currentStation.hasNext())
+		{
+			if(currentStation.hasPrevious()) System.out.println("prev: " + currentStation.getPrevious().getID());
+			System.out.println("curr: " + currentStation.getID());
+			if(currentStation.hasNext()) System.out.println("next: " + currentStation.getNext().getID());
+			System.out.println("-------------------------------------");
+			
+			int currPrice = Calculator.forecastPrice(currentStation.getID(), times.get(currentStation), times.get(currentStation));
+			int nextPrice = Calculator.forecastPrice(currentStation.getNext().getID(), times.get(currentStation.getNext()), times.get(currentStation.getNext()));
+			
+			if(nextPrice <= currPrice) cheapest = currentStation.getNext();
+			
+			currentStation = currentStation.getNext();
+		}
+		
+		return cheapest;
+	}
+	
+	private double getGasConsume(double distance)
+	{
+		return distance * (5.6 / 100);
+	}
+	
+	private double distanceBetween(RouteGasstation stationA, RouteGasstation stationB)
+	{
+		float latA = stationA.getAddress().getLatitude();
+		float lonA = stationA.getAddress().getLongitude();
+			
+		float latB = stationB.getAddress().getLatitude();
+		float lonB = stationB.getAddress().getLongitude();
+			
+		return 6378.388 * Math.acos(Math.sin(latA) * Math.sin(latB) + Math.cos(latA) * Math.cos(latB) * Math.cos(lonB - lonA));
+	}
+	
+	private double distanceToEnd(RouteGasstation station)
+	{
+		return distanceBetween(station, stations.get(stations.size() - 1));
 	}
 }

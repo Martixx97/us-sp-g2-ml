@@ -53,7 +53,7 @@ public class Calculator
 			currentTime.setDay(currentTime.getDay() + 1);
 		}
 		
-		Intellitank.logger.log("averages > " + averages);
+//		Intellitank.logger.log("averages > " + averages);
 		
 		if(!averages.isEmpty())
 		{
@@ -65,7 +65,7 @@ public class Calculator
 			result /= averages.size();
 		}
 		
-		Intellitank.logger.log("result > " + result);
+//		Intellitank.logger.log("result > " + result);
 		
 		return result;
 	}
