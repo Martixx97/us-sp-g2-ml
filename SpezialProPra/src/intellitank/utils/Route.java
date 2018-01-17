@@ -1,6 +1,7 @@
 package intellitank.utils;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 
 import intellitank.Intellitank;
@@ -16,6 +17,7 @@ public class Route
 	private LinkedHashMap<RouteGasstation, Timestamp> times;
 
 	private ArrayList<RouteGasstation> stations;
+	private ArrayList<RouteGasstation> sortedCheapList;
 	
 	public Route(int maxTank, LinkedHashMap<Timestamp, Integer> stops)
 	{
@@ -27,21 +29,25 @@ public class Route
 		this.times = new LinkedHashMap<RouteGasstation, Timestamp>();
 		this.stations = new ArrayList<>();
 		
+		int i = 0;
+		
 		for(Timestamp time : stops.keySet())
 		{
-			RouteGasstation gasStation = new RouteGasstation(Intellitank.gasStationList.get(stops.get(time)));
+			RouteGasstation gasStation = new RouteGasstation(i++, Intellitank.gasStationList.get(stops.get(time)));
 			
 			times.put(gasStation, time);		
 			stations.add(gasStation);
 		}
 		
-		for(int i=0; i<stations.size(); i++)
+		for(i=0; i<stations.size(); i++)
 		{
 			RouteGasstation gasStation = stations.get(i);
 			
 			if(i > 0) gasStation.setPrevious(stations.get(i - 1));
 			if(i < (stations.size() - 1)) gasStation.setNext(stations.get(i + 1));
 		}
+		
+		this.sortedCheapList = getSortedCheapList();
 		
 		if(times.size() != stations.size()) Intellitank.logger.error("ERROR 105 | different list size in Route");
 	}
@@ -99,8 +105,11 @@ public class Route
 	public LinkedHashMap<RouteGasstation, Double> getTankResults()
 	{
 		LinkedHashMap<RouteGasstation, Double> results = new LinkedHashMap<>();
+		sortedCheapList = getSortedCheapList();
 		
 		RouteGasstation curr = stations.get(0);
+		
+		sortedCheapList.remove(curr);
 		
 		while(curr != stations.get(stations.size() - 1))
 		{
@@ -116,7 +125,7 @@ public class Route
 				currentTank = maxTank - currentTank;
 
 				RouteGasstation cheapest = nextCheapest(curr);
-				System.err.println(cheapest.getID());
+				
 				currentTank -= getGasConsume(distanceBetween(curr, cheapest));
 				curr = cheapest;
 			}
@@ -127,25 +136,52 @@ public class Route
 	
 	private RouteGasstation nextCheapest(RouteGasstation gasstation)
 	{
-		RouteGasstation currentStation = gasstation;
-		RouteGasstation cheapest = currentStation.getNext();
+		RouteGasstation cheapest = null;
 		
-		while(currentStation.hasNext())
+		for(RouteGasstation cheapStation : sortedCheapList)
 		{
-			if(currentStation.hasPrevious()) System.out.println("prev: " + currentStation.getPrevious().getID());
-			System.out.println("curr: " + currentStation.getID());
-			if(currentStation.hasNext()) System.out.println("next: " + currentStation.getNext().getID());
-			System.out.println("-------------------------------------");
-			
-			int currPrice = Calculator.forecastPrice(currentStation.getID(), times.get(currentStation), times.get(currentStation));
-			int nextPrice = Calculator.forecastPrice(currentStation.getNext().getID(), times.get(currentStation.getNext()), times.get(currentStation.getNext()));
-			
-			if(nextPrice <= currPrice) cheapest = currentStation.getNext();
-			
-			currentStation = currentStation.getNext();
+			if(cheapStation.getRouteID() < gasstation.getRouteID())
+			{
+				sortedCheapList.remove(cheapStation);
+				continue;
+			}
+			System.out.println(distanceBetween(gasstation, cheapStation) + " > " + maxDistance);
+			if(distanceBetween(gasstation, cheapStation) > maxDistance) continue;
+				
+			cheapest = cheapStation; System.out.println("cheapest: " + cheapest.getID());
+			sortedCheapList.remove(cheapest);
+			break;
 		}
 		
 		return cheapest;
+	}
+	
+	private ArrayList<RouteGasstation> getSortedCheapList()
+	{
+		LinkedHashMap<RouteGasstation, Integer> stationPrices = new LinkedHashMap<>();
+		
+		for(RouteGasstation gasStation : stations)
+		{
+			stationPrices.put(gasStation, Calculator.forecastPrice(gasStation.getID(), times.get(gasStation), times.get(gasStation)));
+		}
+		
+		ArrayList<RouteGasstation> results = new ArrayList<>();
+		
+		for(RouteGasstation gasStation : stationPrices.keySet())
+		{
+			results.add(gasStation);
+		}
+		
+		results.sort(new Comparator<RouteGasstation>()
+		{
+			@Override
+			public int compare(RouteGasstation o1, RouteGasstation o2)
+			{
+				return stationPrices.get(o1) - stationPrices.get(o2);
+			}
+		});
+		
+		return results;
 	}
 	
 	private double getGasConsume(double distance)
