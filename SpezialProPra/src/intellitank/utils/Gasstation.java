@@ -52,6 +52,8 @@ public class Gasstation
 			name = data.split(";")[1];
 			brand = data.split(";")[2];
 			
+			if(name.equalsIgnoreCase("nicht mehr aktiv")) return null;
+			
 			String addressData = "";
 			
 			for(int i=3; i<data.split(";").length; i++)
@@ -66,29 +68,6 @@ public class Gasstation
 		} else
 		{
 			Intellitank.logger.throwInvalidDataInput("Gasstation.fromString(...)");
-			return null;
-		}
-	}
-	
-	public static Gasstation fromID(int id)
-	{
-		if(id > 0 || id < 15226)
-		{
-			String data = Reader.readURL(DataStorage.getStationList());
-			
-			String[] split = data.split("\\|");
-			
-			for(int i=0; i<split.length; i++)
-			{
-				Gasstation station = Gasstation.fromString(split[i]);
-				
-				if(station.getID() == id) return station;
-			}
-			
-			return null;
-		} else
-		{
-			Intellitank.logger.throwInvalidGasstationID(id);			
 			return null;
 		}
 	}

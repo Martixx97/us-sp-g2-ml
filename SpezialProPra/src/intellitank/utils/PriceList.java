@@ -88,7 +88,7 @@ public class PriceList
 			}
 		}
 		
-		return null;
+		return 0;
 	}
 	
 	public HashMap<Timestamp, Integer> getValues()

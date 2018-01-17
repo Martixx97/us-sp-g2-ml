@@ -6,12 +6,12 @@ import intellitank.main.Reader;
 
 public class Address
 {
-	private String street, city;
-	private int housenumber, zip;
+	private String street, city, housenumber;
+	private int zip;
 	
 	private float latitude, longitude;
 	
-	public Address(String street, int housenumber, int zip, String city, float latitude, float longitude)
+	public Address(String street, String housenumber, int zip, String city, float latitude, float longitude)
 	{
 		this.street = street;
 		this.housenumber = housenumber;
@@ -32,21 +32,27 @@ public class Address
 	{
 		if(!data.isEmpty())
 		{
-			String street = "", city = "";
-			int housenumber = 0, zip = 0;
+			String street = "", city = "", housenumber = "";
+			int zip = 0;
 			
 			float latitude = 0f, longitude = 0f;
+			
+			if(data.split(";").length != 6) data = "Straße;" + data;
+			
+			String cleanedZIP = data.split(";")[2].replace(" ", "").replace("\"", "");
+			
 			try
 			{
 				street = data.split(";")[0];
-				housenumber = Integer.valueOf(data.split(";")[1]);
-				zip = Integer.valueOf(data.split(";")[2]);
+				housenumber = data.split(";")[1];
+				if(!cleanedZIP.isEmpty()) zip = Integer.valueOf(cleanedZIP);
 				city = data.split(";")[3];
 				
 				latitude = Float.valueOf(data.split(";")[4]);
 				longitude = Float.valueOf(data.split(";")[5]);
 			} catch (NumberFormatException exception)
 			{
+				System.out.println(data);
 				Intellitank.logger.throwNumberFormat(exception);
 			}
 			
@@ -68,12 +74,12 @@ public class Address
 		this.street = street;
 	}
 
-	public int getHousenumber()
+	public String getHousenumber()
 	{
 		return housenumber;
 	}
 
-	public void setHousenumber(int housenumber)
+	public void setHousenumber(String housenumber)
 	{
 		this.housenumber = housenumber;
 	}

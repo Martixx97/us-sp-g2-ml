@@ -46,7 +46,7 @@ public class Calculator
 					time.setHour(time.getHour() + 1);
 					temp += prices.getPriceAt(time);
 
-					averages.add(temp / 3);
+					if(temp > 0) averages.add(temp / 3);
 				}
 			}
 			

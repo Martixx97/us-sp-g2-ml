@@ -1,16 +1,18 @@
 package intellitank.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.function.LongConsumer;
 
 import intellitank.Intellitank;
-import intellitank.Logger;
-import intellitank.main.DataStorage;
+import intellitank.main.Calculator;
 
 public class Route
 {	
 	private int capacity;
+	
+	private double currentTank;
+	private double maxDistance;
 	
 	private ArrayList<Timestamp> times;
 	private ArrayList<RouteGasstation> stations;
@@ -22,16 +24,76 @@ public class Route
 	{
 		this.capacity = capacity;
 		
+		this.times = new ArrayList<>();
+		this.stations = new ArrayList<>();
+		
 		for(Timestamp time : stops.keySet())
 		{
-			times.add(time);
-			stations.add(new RouteGasstation(Gasstation.fromID(stops.get(time))));
+			times.add(time);		
+			stations.add(new RouteGasstation(Intellitank.gasStationList.get(stops.get(time))));
+		}
+		
+		for(int i=0; i<stations.size(); i++)
+		{
+			RouteGasstation gasStation = stations.get(i);
+			
+			if(i > 0) gasStation.setPrevious(stations.get(i - 1));
+			if(i < (stations.size() - 1)) gasStation.setNext(stations.get(i + 1));
 		}
 		
 		this.index = 0;
 		this.current = stations.get(index);
 		
+		this.currentTank = 0;
+		this.maxDistance = capacity / 5.6 * 100;
+		
 		if(times.size() != stations.size()) Intellitank.logger.error("ERROR 105 | different list size in Route");
+	}
+	
+	public LinkedHashMap<RouteGasstation, Double> getTankResults()
+	{
+		LinkedHashMap<RouteGasstation, Double> results = new LinkedHashMap<>();
+		
+		RouteGasstation curr = stations.get(0);
+		
+		while(curr != stations.get(stations.size() - 1))
+		{
+			if(distanceToEnd() <= maxDistance)
+			{
+				results.put(curr, getGasConsume(distanceToEnd()) - currentTank);
+
+				currentTank -= getGasConsume(distanceToNext());
+				curr = stations.get(stations.size() - 1);
+			} else
+			{
+				results.put(curr, capacity - currentTank);
+				currentTank = capacity - currentTank;
+
+				currentTank -= getGasConsume(distanceToNext());
+				curr = nextCheapest(curr);
+			}
+		}
+		
+		return results;
+	}
+	
+	private RouteGasstation nextCheapest(RouteGasstation gasstation)
+	{
+		RouteGasstation cheapest = gasstation.getNext();
+		
+		while(gasstation.hasNext())
+		{
+			if(Calculator.forecastPrice(gasstation.getNext().getID(), times.get(index + 1), times.get(index + 1)) <= Calculator.forecastPrice(gasstation.getID(), times.get(index), times.get(index))) cheapest = gasstation;
+			
+			gasstation = gasstation.getNext();
+		}
+		
+		return cheapest;
+	}
+	
+	private double getGasConsume(double distance)
+	{
+		return distance * (5.6 / 100);
 	}
 	
 	public double distanceToPrevious()
@@ -64,6 +126,17 @@ public class Route
 		}
 		
 		return 0.0d;
+	}
+	
+	public double distanceToEnd()
+	{
+		float latA = current.getAddress().getLatitude();
+		float lonA = current.getAddress().getLongitude();
+			
+		float latB = stations.get(stations.size() - 1).getAddress().getLatitude();
+		float lonB = stations.get(stations.size() - 1).getAddress().getLongitude();
+			
+		return 6378.388 * Math.acos(Math.sin(latA) * Math.sin(latB) + Math.cos(latA) * Math.cos(latB) * Math.cos(lonB - lonA));
 	}
 
 	public int getCapacity()
@@ -121,21 +194,21 @@ public class Route
 			int capacity = 0;
 			LinkedHashMap<Timestamp, Integer> stops = new LinkedHashMap<>();
 			
-			String[] split = data.split("\\|");
+			String[] line = data.split("\\|");
 			
 			try
 			{
-				capacity = Integer.valueOf(split[0]);
+				capacity = Integer.valueOf(line[0]);
 			} catch (NumberFormatException exception)
 			{
 				Intellitank.logger.throwNumberFormat(exception);
 			}
 			
-			for(int i=1; i<split.length; i++)
+			for(int i=1; i<line.length; i++)
 			{
 				try
 				{
-					stops.put(Timestamp.fromString(split[i].split(";")[0]), Integer.valueOf(split[i].split(";")[1]));
+					stops.put(Timestamp.fromString(line[i].split(";")[0]), Integer.valueOf(line[i].split(";")[1]));
 				} catch (NumberFormatException exception)
 				{
 					Intellitank.logger.throwNumberFormat(exception);

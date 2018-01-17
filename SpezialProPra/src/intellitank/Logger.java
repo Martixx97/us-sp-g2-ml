@@ -19,7 +19,7 @@ public class Logger
 	{
 		this.console = console;
 		
-		console.setEditable(false);
+		if(console != null) console.setEditable(false);
 	}
 	
 	public boolean isDebugActive()
@@ -66,11 +66,13 @@ public class Logger
 	public void throwNumberFormat(NumberFormatException exception)
 	{
 		error(exception.toString() + "(type 102)");
+		exception.printStackTrace();
 	}
 	
 	public void throwIO(IOException exception)
 	{
 		error(exception.toString() + "(type 103)");
+		exception.printStackTrace();
 	}
 	
 	public void throwInvalidGasstationID(int id)
