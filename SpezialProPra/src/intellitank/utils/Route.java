@@ -126,7 +126,7 @@ public class Route
 
 				RouteGasstation cheapest = nextCheapest(curr);
 				
-				currentTank -= getGasConsume(distanceBetween(curr, cheapest));
+				currentTank -= getGasConsume(distance(curr, cheapest));
 				curr = cheapest;
 			}
 		}
@@ -189,6 +189,24 @@ public class Route
 		return distance * (5.6 / 100);
 	}
 	
+	private double distance(RouteGasstation start, RouteGasstation end)
+	{
+		double distance = 0.0D;
+		
+		RouteGasstation currentStation = start;
+		
+		for(RouteGasstation gasStation : stations)
+		{
+			if(currentStation.getRouteID() >= end.getRouteID()) break;
+			if(gasStation.getRouteID() <= start.getRouteID()) continue;
+			
+			distance += distanceBetween(currentStation, gasStation);
+			currentStation = gasStation;
+		}
+		
+		return distance;
+	}
+	
 	private double distanceBetween(RouteGasstation stationA, RouteGasstation stationB)
 	{
 		float latA = stationA.getAddress().getLatitude();
@@ -202,6 +220,18 @@ public class Route
 	
 	private double distanceToEnd(RouteGasstation station)
 	{
-		return distanceBetween(station, stations.get(stations.size() - 1));
+		double distance = 0.0D;
+		
+		RouteGasstation currentStation = station;
+		
+		for(RouteGasstation gasStation : stations)
+		{
+			if(gasStation.getRouteID() <= station.getRouteID()) continue;
+			
+			distance += distanceBetween(currentStation, gasStation);
+			currentStation = gasStation;
+		}
+		
+		return distance;
 	}
 }
